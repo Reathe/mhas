@@ -3,12 +3,9 @@ package tsp.projects.recuit;
 import tsp.evaluation.Coordinates;
 import tsp.evaluation.Evaluation;
 import tsp.evaluation.Path;
-import tsp.evaluation.Problem;
-import tsp.projects.CompetitorProject;
 import tsp.projects.DemoProject;
 import tsp.projects.InvalidProjectException;
 
-import java.util.Arrays;
 import java.util.Random;
 
 public class Recuit extends DemoProject {
@@ -20,10 +17,10 @@ public class Recuit extends DemoProject {
     double fSi, fSpi, sommeFsi = 0;
     private double p0 = 0.8;
     private int lastEchangei, lastEchangej;
-    Random r = new Random();
+    Random r = new Random(System.currentTimeMillis());
 
     /**
-     * 
+     *
      * Let s = s0 For k = 0 through kmax (exclusive): T ← temperature( (k+1)/kmax )
      * Pick a random neighbour, snew ← neighbour(s) If P(E(s), E(snew), T) ≥
      * random(0, 1): s ← snew Output: the final state s
@@ -31,7 +28,7 @@ public class Recuit extends DemoProject {
 
     /**
      * Méthode d'évaluation de la solution
-     * 
+     *
      * @param evaluation
      * @throws InvalidProjectException
      */
@@ -49,7 +46,8 @@ public class Recuit extends DemoProject {
         fSi = this.evaluation.evaluate(this.path);
 
         for (int i = 0; i < 100; i++) {
-            fSpi = evaluation.evaluate(echangeRandom(path));
+            path = echangeRandom(path);
+            fSpi = evaluation.evaluate(path);
             sommeFsi += fSpi - fSi;
             fSi = fSpi;
         }
@@ -87,21 +85,31 @@ public class Recuit extends DemoProject {
     }
 
     @Override
-    public void loop() {/*
-                         * transfoT++; fSpi = evaluation.evaluate(echangeRandom(path)); // Les
-                         * conditions que j'ai pas capté double p = Math.min(1, Math.exp(-(fSpi - fSi) /
-                         * T)); if (fSpi < fSi || r.nextDouble() < (1 - p)) { fSi = fSpi; transfoA++; }
-                         * if (transfoA%12 == 0 || transfoT%100 == 0) T *= lambda;
-                         */
+    public void loop() {
+
+        transfoT++;
+        Path temp = echangeRandom(path);
+        fSpi = evaluation.evaluate(temp); // Lesconditions que j'ai pas capté
+        double p = Math.min(1, Math.exp(-(fSpi - fSi) / T));
+
+        if (fSpi < fSi || r.nextDouble() < (1 - p)) {
+            //System.out.println("oui");
+            path = temp;
+            fSi = fSpi;
+            transfoA++;
+        }
+        if (transfoA % 12 == 0 || transfoT % 100 == 0)
+            T *= lambda;
+
     }
 
     private Path echangeRandom(Path path) {
-        // Path newPath = Path((int[]) (path.getPath().clone()));
+        Path newPath = new Path(path.getPath().clone());
         lastEchangei = r.nextInt(length);
         lastEchangej = r.nextInt(length);
-        echange(lastEchangei, lastEchangej, path);
+        echange(lastEchangei, lastEchangej, newPath);
 
-        return path;
+        return newPath;
     }
 
     private void echange(int i, int j, Path p) {
