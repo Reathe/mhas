@@ -10,7 +10,7 @@ import java.util.Random;
 
 public class Recuit extends DemoProject {
     private int length;
-    private int transfoA = 0 , transfoT = 0;
+    private int transfoA = 0, transfoT = 0;
     private Path path;
     private double T;
     private final double lambda = 0.99;
@@ -40,9 +40,9 @@ public class Recuit extends DemoProject {
 
     @Override
     public void initialization() {
-
+        int n = 0;
         length = this.problem.getLength();
-        int[] chemin = getCheminVillePlusProche();
+        int[] chemin = Path.getRandomPath(length);//getCheminVillePlusProche();
         this.path = new Path(chemin);
         fSi = this.evaluation.evaluate(this.path);
 
@@ -85,6 +85,32 @@ public class Recuit extends DemoProject {
         return chemin;
     }
 
+    public Path opt2(Path path) {
+        for (int i = 0; i < length - 2; i++) {
+            for (int j = i + 2; j < length - 1; j++) {
+                double eval = evaluation.quickEvaluate(path),
+                        evalapres;
+                Coordinates v = problem.getCoordinates(i),
+                        sv = problem.getCoordinates(i + 1),
+                        p = problem.getCoordinates(j),
+                        sp = problem.getCoordinates(j + 1);
+                if (v.distance(sv) + p.distance(sp) > v.distance(p) + sv.distance(sp)) {
+                    Path newp = new Path(path);
+                    echangeOrdreEntreIEtJ(i + 1, j, newp);
+                    evalapres = evaluation.quickEvaluate(path);
+                    if (evalapres > eval) {
+
+                    } else {
+                        path = newp;
+                        //System.out.println("amélio " + eval + "->" + evalapres);
+                    }
+                    //System.out.println("oui");
+                }
+            }
+        }
+        return path;
+    }
+
     @Override
     public void loop() {
 
@@ -97,11 +123,18 @@ public class Recuit extends DemoProject {
             //System.out.println("oui");
             fSi = fSpi;
             transfoA++;
-        }
-        else echange(lastEchangei, lastEchangej, path);
+        } else echange(lastEchangei, lastEchangej, path);
         if (transfoA % 12 == 0 || transfoT % 100 == 0)
             T *= lambda;
 
+    }
+
+    private void echangeOrdreEntreIEtJ(int i, int j, Path p) {
+        while (i < j) {
+            echange(i, j, p);
+            i++;
+            j--;
+        }
     }
 
     private void echangeRandom(Path path) {

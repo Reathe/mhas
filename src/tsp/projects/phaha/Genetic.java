@@ -4,19 +4,21 @@ package tsp.projects.phaha;
 import tsp.evaluation.Coordinates;
 import tsp.evaluation.Evaluation;
 import tsp.evaluation.Path;
-import tsp.evaluation.Problem;
 import tsp.projects.CompetitorProject;
 import tsp.projects.InvalidProjectException;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.Random;
 
 public class Genetic extends CompetitorProject {
 
-    public static final double MUTATION_RATE = 0.01;
+    public static final double MUTATION_RATE = 0.1;
     private int length;
     private Random r = new Random(System.currentTimeMillis());
     private static int POPULATION_SIZE = 100;
     private Path[] population;
+    int nbrun = 0;
 
     public Genetic(Evaluation evaluation) throws InvalidProjectException {
         super(evaluation);
@@ -30,21 +32,43 @@ public class Genetic extends CompetitorProject {
         this.population = new Path[POPULATION_SIZE];
         this.generateRandom(evaluation.getProblem().getLength());
         int[] tmp = getCheminVillePlusProche();
-        for (int i = 0; i < 10; i++)
-            this.population[i] = new Path(tmp.clone());
-
+        this.population[0] = new Path(tmp.clone());
         sortPopulation();
         evaluation.evaluate(population[0]);
     }
 
     @Override
     public void loop() {
+        nbrun++;
         nextGeneration();
         mutateRandom();
         sortPopulation();
         evaluation.evaluate(population[0]);
+        //System.out.println(nbrun);
     }
 
+    public Path opt2(Path path) {
+        for (int i = 0; i < length - 3; i++) {
+            for (int j = i+1; j < length - 1; j++) {
+                double eval = evaluation.quickEvaluate(path),
+                        evalapres;
+                Coordinates v = problem.getCoordinates(i),
+                        sv = problem.getCoordinates(i + 1),
+                        p = problem.getCoordinates(j),
+                        sp = problem.getCoordinates(j + 1);
+                if (v.distance(sv) + p.distance(sp) > v.distance(p) + sv.distance(sp)) {
+                    echangeOrdreEntreIEtJ(i, j, path);
+                    evalapres = evaluation.quickEvaluate(path);
+                    if (evalapres > eval)
+                        echangeOrdreEntreIEtJ(i+1, j, path);
+//                    else
+//                        System.out.println("amélio " + eval + "->" + evalapres);
+                    //System.out.println("oui");
+                }
+            }
+        }
+        return path;
+    }
 
     /**
      * Génère des path randoms pour notre population
@@ -58,16 +82,21 @@ public class Genetic extends CompetitorProject {
      * Mutation aléatoire des éléments de notre population
      */
     public void mutateRandom() {
-        for (int i = POPULATION_SIZE / 2; i < POPULATION_SIZE; i++)
-            mutate(population[i]);
+        for (int i = 0; i < POPULATION_SIZE; i++) {
+            if (r.nextDouble() < MUTATION_RATE*4/Math.log(POPULATION_SIZE) && length<1000) {
+                opt2(population[i]);
+            }
+            if (r.nextDouble() < MUTATION_RATE/10)
+                mutate(population[i]);
+        }
     }
 
     public void nextGeneration() {
         Path[] childs;
-        for (int i = POPULATION_SIZE-1; i>POPULATION_SIZE * 3/4; i-=2){
-            childs = crossoverPMX(population[r.nextInt(POPULATION_SIZE/2)], population[r.nextInt(POPULATION_SIZE/2)]);
+        for (int i = POPULATION_SIZE - 1; i > POPULATION_SIZE * 3 / 4; i -= 2) {
+            childs = crossoverPMX(population[r.nextInt(POPULATION_SIZE / 2)], population[r.nextInt(POPULATION_SIZE / 2)]);
             population[i] = childs[0];
-            population[i-1] = childs[1];
+            population[i - 1] = childs[1];
         }
     }
 
@@ -77,18 +106,18 @@ public class Genetic extends CompetitorProject {
      * @param p : Population à muter
      */
     public void mutate(Path p) {
+        echangeRandom(p);
+
 //        for (int i = 0; i < this.problem.getLength(); i++)
-            if(r.nextDouble() < MUTATION_RATE)
-                echangeRandom(p);
-//                echange(i, r.nextInt(this.problem.getLength()), p);
+//        echange(i, r.nextInt(this.problem.getLength()), p);
     }
 
-    public Path[] crossoverPMX(Path p1, Path p2){
+    public Path[] crossoverPMX(Path p1, Path p2) {
         int v = r.nextInt(length);
-        int [] child1 = p1.getPath().clone();
-        int [] child2 = p2.getPath().clone();
+        int[] child1 = p1.getPath().clone();
+        int[] child2 = p2.getPath().clone();
 
-        for (int i= 0; i<=v; i++){
+        for (int i = 0; i <= v; i++) {
             echange(i, getIndice(p2.getPath()[i], child1), child1);
             echange(i, getIndice(p1.getPath()[i], child2), child2);
         }
@@ -96,9 +125,9 @@ public class Genetic extends CompetitorProject {
         return new Path[]{new Path(child1), new Path(child2)};
     }
 
-    private int getIndice(int val, int[] arr){
-        for (int i = 0; i<arr.length; i++)
-            if(arr[i] == val) return i;
+    private int getIndice(int val, int[] arr) {
+        for (int i = 0; i < arr.length; i++)
+            if (arr[i] == val) return i;
         return -1;
     }
 
@@ -142,6 +171,13 @@ public class Genetic extends CompetitorProject {
         });
     }
 
+    private void echangeOrdreEntreIEtJ(int i, int j, Path p) {
+        while (i < j) {
+            echange(i, j, p);
+            i++;
+            j--;
+        }
+    }
 
     private void echangeRandom(Path path) {
         int lastEchangei = r.nextInt(path.getPath().length);
@@ -160,4 +196,5 @@ public class Genetic extends CompetitorProject {
         tab[i] = tab[j];
         tab[j] = temp;
     }
+
 }
