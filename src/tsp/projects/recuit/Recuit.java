@@ -10,12 +10,12 @@ import java.util.Random;
 
 public class Recuit extends DemoProject {
     private int length;
-    private int transfoA, transfoT = 99;
+    private int transfoA = 0 , transfoT = 0;
     private Path path;
     private double T;
-    private double lambda = 0.99;
+    private final double lambda = 0.99;
     double fSi, fSpi, sommeFsi = 0;
-    private double p0 = 0.8;
+    private final double p0 = 0.8;
     private int lastEchangei, lastEchangej;
     Random r = new Random(System.currentTimeMillis());
 
@@ -41,18 +41,19 @@ public class Recuit extends DemoProject {
     @Override
     public void initialization() {
 
+        length = this.problem.getLength();
         int[] chemin = getCheminVillePlusProche();
         this.path = new Path(chemin);
         fSi = this.evaluation.evaluate(this.path);
 
         for (int i = 0; i < 100; i++) {
-            path = echangeRandom(path);
+            echangeRandom(path);
             fSpi = evaluation.evaluate(path);
             sommeFsi += fSpi - fSi;
             fSi = fSpi;
         }
 
-        this.T = -(sommeFsi / 100) / Math.log(p0);
+        this.T = -Math.abs(sommeFsi / 100) / Math.log(p0);
 
     }
 
@@ -88,28 +89,25 @@ public class Recuit extends DemoProject {
     public void loop() {
 
         transfoT++;
-        Path temp = echangeRandom(path);
-        fSpi = evaluation.evaluate(temp); // Lesconditions que j'ai pas capté
+        echangeRandom(path);
+        fSpi = evaluation.evaluate(path); // Lesconditions que j'ai pas capté
         double p = Math.min(1, Math.exp(-(fSpi - fSi) / T));
 
-        if (fSpi < fSi || r.nextDouble() < (1 - p)) {
+        if (fSpi < fSi || r.nextDouble() < p) {
             //System.out.println("oui");
-            path = temp;
             fSi = fSpi;
             transfoA++;
         }
+        else echange(lastEchangei, lastEchangej, path);
         if (transfoA % 12 == 0 || transfoT % 100 == 0)
             T *= lambda;
 
     }
 
-    private Path echangeRandom(Path path) {
-        Path newPath = new Path(path.getPath().clone());
+    private void echangeRandom(Path path) {
         lastEchangei = r.nextInt(length);
         lastEchangej = r.nextInt(length);
-        echange(lastEchangei, lastEchangej, newPath);
-
-        return newPath;
+        echange(lastEchangei, lastEchangej, path);
     }
 
     private void echange(int i, int j, Path p) {
