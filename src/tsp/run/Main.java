@@ -37,7 +37,7 @@ public final class Main extends OutputWriter
 
     private static final String LOG_FILE = "tsp.log";
 //	private static final int NB_RUNS = 100;
-	private static final int NB_SECONDS = 60;
+	private static final int NB_SECONDS = 30;
     private static final int NB_RUNS = 1;
 //    private static final int NB_SECONDS = 10;
     
@@ -64,7 +64,7 @@ public final class Main extends OutputWriter
 		Solution solution = null;
 		try
 		{
-			System.setOut (new PrintStream (new OutputStream () {@Override public void write (int b) throws IOException {}}));
+			//System.setOut (new PrintStream (new OutputStream () {@Override public void write (int b) throws IOException {}}));
 			future.get (Main.NB_SECONDS, TimeUnit.SECONDS);
 		}
 		catch (TimeoutException e)
