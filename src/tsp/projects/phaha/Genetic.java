@@ -31,8 +31,10 @@ public class Genetic extends CompetitorProject {
         this.length = problem.getLength();
         this.population = new Path[POPULATION_SIZE];
         this.generateRandom(evaluation.getProblem().getLength());
-        int[] tmp = getCheminVillePlusProche();
-        this.population[0] = new Path(tmp.clone());
+        for (int i = 0; i < length / 10; i++) {
+            int[] tmp = getCheminVillePlusProche();
+            this.population[i] = new Path(tmp);
+        }
         sortPopulation();
         evaluation.evaluate(population[0]);
     }
@@ -49,7 +51,7 @@ public class Genetic extends CompetitorProject {
 
     public Path opt2(Path path) {
         for (int i = 0; i < length - 3; i++) {
-            for (int j = i+1; j < length - 1; j++) {
+            for (int j = i + 2; j < length - 1; j++) {
                 double eval = evaluation.quickEvaluate(path),
                         evalapres;
                 Coordinates v = problem.getCoordinates(i),
@@ -57,10 +59,10 @@ public class Genetic extends CompetitorProject {
                         p = problem.getCoordinates(j),
                         sp = problem.getCoordinates(j + 1);
                 if (v.distance(sv) + p.distance(sp) > v.distance(p) + sv.distance(sp)) {
-                    echangeOrdreEntreIEtJ(i, j, path);
+                    echangeOrdreEntreIEtJ(i + 1, j, path);
                     evalapres = evaluation.quickEvaluate(path);
                     if (evalapres > eval)
-                        echangeOrdreEntreIEtJ(i+1, j, path);
+                        echangeOrdreEntreIEtJ(i + 1, j, path);
 //                    else
 //                        System.out.println("amélio " + eval + "->" + evalapres);
                     //System.out.println("oui");
@@ -82,13 +84,14 @@ public class Genetic extends CompetitorProject {
      * Mutation aléatoire des éléments de notre population
      */
     public void mutateRandom() {
-        for (int i = 0; i < POPULATION_SIZE; i++) {
-            if (r.nextDouble() < MUTATION_RATE*4/Math.log(POPULATION_SIZE) && length<1000) {
-                opt2(population[i]);
-            }
-            if (r.nextDouble() < MUTATION_RATE/10)
+//        for (int i = 0; i < POPULATION_SIZE; i++) {
+//            if (r.nextDouble() < MUTATION_RATE * 2) {
+//                opt2(population[i]);
+//            }
+//        }
+        for (int i = POPULATION_SIZE / 2; i < POPULATION_SIZE; i++)
+            while (r.nextDouble() < MUTATION_RATE * 2)
                 mutate(population[i]);
-        }
     }
 
     public void nextGeneration() {
@@ -136,25 +139,30 @@ public class Genetic extends CompetitorProject {
         int[] chemin = new int[length];
         int[] villeVisite = new int[length];
 
-        chemin[0] = 0;
+        chemin[0] = r.nextInt(length);
+        villeVisite[chemin[0]] = 1;
+
         Coordinates coordi;
         double min;
-        int minVille = 0;
+        int minVille;
         double tempDistance;
 
         for (int i = 1; i < length; i++) {
-            Coordinates coord = problem.getCoordinates(i - 1);
+            Coordinates coord = problem.getCoordinates(chemin[i - 1]);
             min = Double.MAX_VALUE;
-            for (int j = 1; j < chemin.length; j++) {
+            minVille = -1;
+            for (int j = 0; j < chemin.length; j++) {
+                if (villeVisite[j] != 0) continue;
+
                 coordi = problem.getCoordinates(j);
                 tempDistance = coord.distance(coordi);
-                if (tempDistance < min && villeVisite[j] == 0) {
+                if (tempDistance < min) {
                     min = tempDistance;
                     minVille = j;
                 }
             }
             chemin[i] = minVille;
-            villeVisite[minVille] = i;
+            villeVisite[minVille] = 1;
         }
         return chemin;
     }
