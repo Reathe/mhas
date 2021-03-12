@@ -1,4 +1,4 @@
-package tsp.projects.phaha;
+package tsp.projects.genetic;
 
 
 import tsp.evaluation.Coordinates;
@@ -35,6 +35,7 @@ public class Genetic extends CompetitorProject {
             int[] tmp = getCheminVillePlusProche();
             this.population[i] = new Path(tmp);
         }
+
         sortPopulation();
         evaluation.evaluate(population[0]);
         System.out.print(" Fin init");
@@ -42,10 +43,14 @@ public class Genetic extends CompetitorProject {
 
     @Override
     public void loop() {
-        nbrun++;
-        nextGeneration();
-        mutateRandom();
-        sortPopulation();
+        try {
+            nbrun++;
+            nextGeneration();
+            mutateRandom();
+            sortPopulation();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 //        if (length < 130)
 //            if (r.nextDouble() < MUTATION_RATE*Math.log(nbrun) /100 )
 //                while (opt2(population[0])!= null) ;
@@ -100,8 +105,7 @@ public class Genetic extends CompetitorProject {
                 while (r.nextDouble() < MUTATION_RATE * 3)
                     mutate(population[i]);
             else {
-                int e = r.nextInt(length);
-                echangeOrdreEntreIEtJ(r.nextInt(e), e, population[i]);
+                echangeOrdreEntreIEtJ(r.nextInt(length), r.nextInt(length), population[i]);
             }
     }
 
@@ -191,11 +195,31 @@ public class Genetic extends CompetitorProject {
     }
 
     private void echangeOrdreEntreIEtJ(int i, int j, Path p) {
+        if (i > j) {
+            int temp = i;
+            i = j;
+            j = temp;
+        }
         while (i < j) {
             echange(i, j, p);
             i++;
             j--;
         }
+    }
+
+    private void decalageDeIversJ(int i, int j, Path p) {
+        if (i > j) {
+            int temp = i;
+            i = j;
+            j = temp;
+        }
+        int villeADecal = p.getPath()[i];
+        int[] path = p.getPath();
+        while (i < j) {
+            path[i] = path[i + 1];
+            i++;
+        }
+        path[j] = villeADecal;
     }
 
     private void echangeRandom(Path path) {
