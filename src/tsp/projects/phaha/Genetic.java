@@ -16,14 +16,14 @@ public class Genetic extends CompetitorProject {
     public static final double MUTATION_RATE = 0.1;
     private int length;
     private Random r = new Random(System.currentTimeMillis());
-    private static int POPULATION_SIZE = 100;
+    private static int POPULATION_SIZE = 200;
     private Path[] population;
     int nbrun = 0;
 
     public Genetic(Evaluation evaluation) throws InvalidProjectException {
         super(evaluation);
         this.addAuthor("Nous");
-        this.setMethodName("Recuit");
+        this.setMethodName("Genetic");
     }
 
     @Override
@@ -31,12 +31,13 @@ public class Genetic extends CompetitorProject {
         this.length = problem.getLength();
         this.population = new Path[POPULATION_SIZE];
         this.generateRandom(evaluation.getProblem().getLength());
-        for (int i = 0; i < length / 10; i++) {
+        for (int i = 0; i < POPULATION_SIZE / 2; i++) {
             int[] tmp = getCheminVillePlusProche();
             this.population[i] = new Path(tmp);
         }
         sortPopulation();
         evaluation.evaluate(population[0]);
+        System.out.print(" Fin init");
     }
 
     @Override
@@ -45,11 +46,20 @@ public class Genetic extends CompetitorProject {
         nextGeneration();
         mutateRandom();
         sortPopulation();
+//        if (length < 130)
+//            if (r.nextDouble() < MUTATION_RATE*Math.log(nbrun) /100 )
+//                while (opt2(population[0])!= null) ;
+//            for (int i = 0; i < POPULATION_SIZE/10; i++) {
+//                if (r.nextDouble() < MUTATION_RATE * 2) {
+//                    opt2(population[i]);
+//                }
+//            }
         evaluation.evaluate(population[0]);
         //System.out.println(nbrun);
     }
 
     public Path opt2(Path path) {
+        Path pathnew = null;
         for (int i = 0; i < length - 3; i++) {
             for (int j = i + 2; j < length - 1; j++) {
                 double eval = evaluation.quickEvaluate(path),
@@ -63,13 +73,14 @@ public class Genetic extends CompetitorProject {
                     evalapres = evaluation.quickEvaluate(path);
                     if (evalapres > eval)
                         echangeOrdreEntreIEtJ(i + 1, j, path);
-//                    else
+                    else
+                        pathnew = path;
 //                        System.out.println("amélio " + eval + "->" + evalapres);
                     //System.out.println("oui");
                 }
             }
         }
-        return path;
+        return pathnew;
     }
 
     /**
@@ -84,14 +95,14 @@ public class Genetic extends CompetitorProject {
      * Mutation aléatoire des éléments de notre population
      */
     public void mutateRandom() {
-//        for (int i = 0; i < POPULATION_SIZE; i++) {
-//            if (r.nextDouble() < MUTATION_RATE * 2) {
-//                opt2(population[i]);
-//            }
-//        }
         for (int i = POPULATION_SIZE / 2; i < POPULATION_SIZE; i++)
-            while (r.nextDouble() < MUTATION_RATE * 2)
-                mutate(population[i]);
+            if (r.nextDouble() < 0.5)
+                while (r.nextDouble() < MUTATION_RATE * 3)
+                    mutate(population[i]);
+            else {
+                int e = r.nextInt(length);
+                echangeOrdreEntreIEtJ(r.nextInt(e), e, population[i]);
+            }
     }
 
     public void nextGeneration() {
