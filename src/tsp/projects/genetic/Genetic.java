@@ -16,8 +16,7 @@ import java.util.HashMap;
 
 public class Genetic extends Project {
 
-    Utilities u = new Utilities();
-    public static final double MUTATION_RATE = 0.1;
+    Utilities u = Utilities.getInstance();
     private int length;
     private static final int POPULATION_SIZE = 200;
     private Path[] population;

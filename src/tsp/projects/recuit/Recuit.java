@@ -18,18 +18,10 @@ public class Recuit extends DemoProject {
     private final double lambda = 0.99;
     double fSi, fSpi, sommeFsi = 0;
     private final double p0 = 0.8;
-    private int lastEchangei, lastEchangej;
     Random r = new Random(System.currentTimeMillis());
-    private Utilities utilities = new Utilities();
-    private Mutation mut = mutList[u.getRandom().nextInt(mutList.length)];
+    private final Utilities u = Utilities.getInstance();
+    private final Mutation[] mutList = Mutation.getMutationList(problem, evaluation);
 
-
-    /**
-     *
-     * Let s = s0 For k = 0 through kmax (exclusive): T ← temperature( (k+1)/kmax )
-     * Pick a random neighbour, snew ← neighbour(s) If P(E(s), E(snew), T) ≥
-     * random(0, 1): s ← snew Output: the final state s
-     */
 
     /**
      * Méthode d'évaluation de la solution
@@ -45,11 +37,9 @@ public class Recuit extends DemoProject {
 
     @Override
     public void initialization() {
-        int n = 0;
-
 
         length = this.problem.getLength();
-        int[] chemin = utilities.getCheminVillePlusProche(this.problem);
+        int[] chemin = u.getCheminVillePlusProche(this.problem);
         this.path = new Path(chemin);
         fSi = this.evaluation.evaluate(this.path);
 
@@ -69,40 +59,25 @@ public class Recuit extends DemoProject {
 
         transfoT++;
         Path temp = new Path(path);
-        mut.mutate(temp);
-//        echangeRandom(path);
-        fSpi = evaluation.evaluate(temp); // Lesconditions que j'ai pas capté
+
+        mutList[r.nextInt(mutList.length)].mutate(temp);
+
+        fSpi = evaluation.evaluate(temp);
         double p = Math.min(1, Math.exp(-(fSpi - fSi) / T));
 
         if (fSpi < fSi || r.nextDouble() < p) {
-            //System.out.println("oui");
             fSi = fSpi;
             transfoA++;
             path = temp;
-        }// else echange(lastEchangei, lastEchangej, path);
+        }
         if (transfoA % 12 == 0 || transfoT % 100 == 0)
             T *= lambda;
 
     }
 
-    private void echangeOrdreEntreIEtJ(int i, int j, Path p) {
-        while (i < j) {
-            echange(i, j, p);
-            i++;
-            j--;
-        }
-    }
-
     private void echangeRandom(Path path) {
-        lastEchangei = r.nextInt(length);
-        lastEchangej = r.nextInt(length);
-        echange(lastEchangei, lastEchangej, path);
+        u.echange(r.nextInt(length), r.nextInt(length), path);
     }
 
-    private void echange(int i, int j, Path p) {
-        int temp = p.getPath()[i];
-        p.getPath()[i] = p.getPath()[j];
-        p.getPath()[j] = temp;
-    }
 
 }

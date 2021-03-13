@@ -12,14 +12,14 @@ import java.util.Random;
 
 public class Colony extends CompetitorProject {
 
-    private final static double C = 0.1;
-    private final static double EVAPORATION = 0.9;
-    private final static double Q = 100;
-    private final static double antFactor = 0.01;
+    private final static double C = 1;
+    private final static double EVAPORATION = 0.90;
+    private final static double Q = 500;
+//    private final static double antFactor = 0.01;
     private double randomFactor = 0.01;
 
     private int COLONY_SIZE;
-    public final static double ALPHA = 1.00;
+    public final static double ALPHA = 2.00;
     public final static double BETA = 5.00;
 
     private Random r = new Random(System.currentTimeMillis());
@@ -37,20 +37,15 @@ public class Colony extends CompetitorProject {
 
     @Override
     public void initialization() {
-
-
         this.nbVilles = evaluation.getProblem().getLength();
         COLONY_SIZE = Math.max(1, (int) Math.log(1.0 / nbVilles) + 5);
         colony = new Ant[COLONY_SIZE];
         pheromones = new double[nbVilles][nbVilles];
 
-        for (int i = 0; i < COLONY_SIZE; i++) {
+        for (int i = 0; i < COLONY_SIZE; i++)
             colony[i] = new Ant(nbVilles);
-        }
         for (int i = 0; i < nbVilles; i++)
             Arrays.fill(pheromones[i], C);
-
-
     }
 
     @Override
@@ -68,15 +63,6 @@ public class Colony extends CompetitorProject {
 
     private void clearColony() {
         for (Ant ant : colony) ant.reset();
-    }
-
-    private int getMax(double[] arr) {
-        int maxI = 0;
-        for (int p = 1; p < arr.length; p++) {
-            if (arr[p] > arr[maxI])
-                maxI = p;
-        }
-        return maxI;
     }
 
     public double[] calculateProbabilities(Ant ant) {
@@ -137,16 +123,15 @@ public class Colony extends CompetitorProject {
         for (int i = 0; i < colony.length; i++)
             for (int j = 0; j < nbVilles - 1; j++) {
                 double[] probs = calculateProbabilities(colony[i]);
-
                 colony[i].visitCity(chooseProb(probs));
             }
     }
 
     private int chooseProb(double[] probs) {
         double sum = 0;
-        for (double p : probs) {
+        for (double p : probs)
             sum+=p;
-        }
+
         double num = r.nextDouble()*sum;
         sum = 0;
         for (int i = 0; i < probs.length ; i++) {

@@ -31,14 +31,6 @@ public class Ant {
     }
 
     public void visitCity(int city){
-
-        try{
-            if(visited[city]) throw new Exception("Ville n°"+city+" déjà visitée\n"+this.toString());
-
-        }
-        catch (Exception e){
-            e.printStackTrace();
-        }
         path[currentIndex] = city;
         visited[city] = true;
         currentIndex++;

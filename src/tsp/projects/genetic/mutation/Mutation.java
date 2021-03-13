@@ -8,7 +8,9 @@ import tsp.projects.genetic.Utilities;
 public abstract class Mutation extends Utilities {
     public Problem problem;
     public Evaluation evaluation;
+
     public Mutation(Problem problem, Evaluation evaluation){
+        super();
         this.problem = problem;
         this.evaluation = evaluation;
     }
