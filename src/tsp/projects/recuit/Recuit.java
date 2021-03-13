@@ -5,6 +5,8 @@ import tsp.evaluation.Evaluation;
 import tsp.evaluation.Path;
 import tsp.projects.DemoProject;
 import tsp.projects.InvalidProjectException;
+import tsp.projects.genetic.Utilities;
+import tsp.projects.genetic.mutation.Mutation;
 
 import java.util.Random;
 
@@ -18,6 +20,9 @@ public class Recuit extends DemoProject {
     private final double p0 = 0.8;
     private int lastEchangei, lastEchangej;
     Random r = new Random(System.currentTimeMillis());
+    private Utilities utilities = new Utilities();
+    private Mutation mut = mutList[u.getRandom().nextInt(mutList.length)];
+
 
     /**
      *
@@ -41,8 +46,10 @@ public class Recuit extends DemoProject {
     @Override
     public void initialization() {
         int n = 0;
+
+
         length = this.problem.getLength();
-        int[] chemin = Path.getRandomPath(length);//getCheminVillePlusProche();
+        int[] chemin = utilities.getCheminVillePlusProche(this.problem);
         this.path = new Path(chemin);
         fSi = this.evaluation.evaluate(this.path);
 
@@ -57,73 +64,22 @@ public class Recuit extends DemoProject {
 
     }
 
-    private int[] getCheminVillePlusProche() {
-        this.length = this.problem.getLength();
-        int[] chemin = new int[length];
-        int[] villeVisite = new int[length];
-
-        chemin[0] = 0;
-        Coordinates coordi;
-        double min;
-        int minVille = 0;
-        double tempDistance;
-
-        for (int i = 1; i < length; i++) {
-            Coordinates coord = problem.getCoordinates(i - 1);
-            min = Double.MAX_VALUE;
-            for (int j = 1; j < chemin.length; j++) {
-                coordi = problem.getCoordinates(j);
-                tempDistance = coord.distance(coordi);
-                if (tempDistance < min && villeVisite[j] == 0) {
-                    min = tempDistance;
-                    minVille = j;
-                }
-            }
-            chemin[i] = minVille;
-            villeVisite[minVille] = i;
-        }
-        return chemin;
-    }
-
-    public Path opt2(Path path) {
-        for (int i = 0; i < length - 2; i++) {
-            for (int j = i + 2; j < length - 1; j++) {
-                double eval = evaluation.quickEvaluate(path),
-                        evalapres;
-                Coordinates v = problem.getCoordinates(i),
-                        sv = problem.getCoordinates(i + 1),
-                        p = problem.getCoordinates(j),
-                        sp = problem.getCoordinates(j + 1);
-                if (v.distance(sv) + p.distance(sp) > v.distance(p) + sv.distance(sp)) {
-                    Path newp = new Path(path);
-                    echangeOrdreEntreIEtJ(i + 1, j, newp);
-                    evalapres = evaluation.quickEvaluate(path);
-                    if (evalapres > eval) {
-
-                    } else {
-                        path = newp;
-                        //System.out.println("amélio " + eval + "->" + evalapres);
-                    }
-                    //System.out.println("oui");
-                }
-            }
-        }
-        return path;
-    }
-
     @Override
     public void loop() {
 
         transfoT++;
-        echangeRandom(path);
-        fSpi = evaluation.evaluate(path); // Lesconditions que j'ai pas capté
+        Path temp = new Path(path);
+        mut.mutate(temp);
+//        echangeRandom(path);
+        fSpi = evaluation.evaluate(temp); // Lesconditions que j'ai pas capté
         double p = Math.min(1, Math.exp(-(fSpi - fSi) / T));
 
         if (fSpi < fSi || r.nextDouble() < p) {
             //System.out.println("oui");
             fSi = fSpi;
             transfoA++;
-        } else echange(lastEchangei, lastEchangej, path);
+            path = temp;
+        }// else echange(lastEchangei, lastEchangej, path);
         if (transfoA % 12 == 0 || transfoT % 100 == 0)
             T *= lambda;
 

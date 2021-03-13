@@ -5,13 +5,14 @@ import tsp.evaluation.Evaluation;
 import tsp.evaluation.Path;
 import tsp.projects.CompetitorProject;
 import tsp.projects.InvalidProjectException;
+import tsp.projects.genetic.mutation.Mutation;
 
 import java.util.Arrays;
 import java.util.Random;
 
 public class Colony extends CompetitorProject {
 
-    private final static double C = 1.0;
+    private final static double C = 0.1;
     private final static double EVAPORATION = 0.9;
     private final static double Q = 100;
     private final static double antFactor = 0.01;
@@ -19,7 +20,7 @@ public class Colony extends CompetitorProject {
 
     private int COLONY_SIZE;
     public final static double ALPHA = 1.00;
-    public final static double BETA = 25.00;
+    public final static double BETA = 5.00;
 
     private Random r = new Random(System.currentTimeMillis());
     private int nbVilles;
@@ -137,8 +138,23 @@ public class Colony extends CompetitorProject {
             for (int j = 0; j < nbVilles - 1; j++) {
                 double[] probs = calculateProbabilities(colony[i]);
 
-                colony[i].visitCity(getMax(probs));
+                colony[i].visitCity(chooseProb(probs));
             }
+    }
+
+    private int chooseProb(double[] probs) {
+        double sum = 0;
+        for (double p : probs) {
+            sum+=p;
+        }
+        double num = r.nextDouble()*sum;
+        sum = 0;
+        for (int i = 0; i < probs.length ; i++) {
+            sum += probs[i];
+            if (num <= sum)
+                return i;
+        }
+        return -1;
     }
 
 }
