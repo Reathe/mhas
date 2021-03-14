@@ -5,7 +5,6 @@ import tsp.evaluation.Evaluation;
 import tsp.evaluation.Path;
 import tsp.projects.CompetitorProject;
 import tsp.projects.InvalidProjectException;
-import tsp.projects.genetic.mutation.Mutation;
 
 import java.util.Arrays;
 import java.util.Random;
@@ -13,20 +12,20 @@ import java.util.Random;
 public class Colony extends CompetitorProject {
 
     private final static double C = 1;
-    private final static double EVAPORATION = 0.90;
+    private final static double EVAPORATION = 0.99;
     private final static double Q = 500;
 //    private final static double antFactor = 0.01;
     private double randomFactor = 0.01;
 
-    private int COLONY_SIZE;
-    public final static double ALPHA = 2.00;
-    public final static double BETA = 5.00;
+    private int COLONY_SIZE =4;
+    public final static double ALPHA = 1.00;
+    public final static double BETA = 24.00;
 
     private Random r = new Random(System.currentTimeMillis());
     private int nbVilles;
     private Ant[] colony;
     public double[][] pheromones;
-
+    int nbloop=0;
     private double best = Double.MAX_VALUE;
     private Ant bestAnt;
 
@@ -38,7 +37,6 @@ public class Colony extends CompetitorProject {
     @Override
     public void initialization() {
         this.nbVilles = evaluation.getProblem().getLength();
-        COLONY_SIZE = Math.max(1, (int) Math.log(1.0 / nbVilles) + 5);
         colony = new Ant[COLONY_SIZE];
         pheromones = new double[nbVilles][nbVilles];
 
@@ -50,7 +48,8 @@ public class Colony extends CompetitorProject {
 
     @Override
     public void loop() {
-
+        nbloop++;
+        try {
             clearColony();
 
             // Parcours des fourmis
@@ -59,6 +58,10 @@ public class Colony extends CompetitorProject {
             // MAJ des pheromones
             updatePheromones();
             evaluation.evaluate(bestAnt.getPath());
+//            System.out.println(nbloop);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     private void clearColony() {
@@ -69,46 +72,61 @@ public class Colony extends CompetitorProject {
         //La ville actuelle
         double[] probabilities = new double[nbVilles];
         int i = ant.getCurrentCity();
-
-        double pheromone = 0.00;
+        double alpha;
+        double beta;
+        double pheromone = Double.MIN_VALUE;
         for (int l = 0; l < nbVilles; l++) {
             if (!ant.visited(l)) {
 
                 double distanceIL = problem.getCoordinates(i).distance(problem.getCoordinates(l));
-                double alpha = Math.pow(pheromones[i][l], Colony.ALPHA);
-                double beta = Math.pow(1.0 / distanceIL, Colony.BETA);
+                alpha = pow(pheromones[i][l], (int) Colony.ALPHA);
+                beta = pow(1.0 / distanceIL, (int) Colony.BETA);
 
                 double res = alpha * beta;
                 probabilities[l] = res;
                 pheromone += res;
+
+            }else  {
+                probabilities[l] = 0.0;
             }
         }
 
         for (int j = 0; j < nbVilles; j++) {
             if (ant.visited(j))
                 probabilities[j] = 0.0;
-            else
+            else {
                 probabilities[j] = probabilities[j] / pheromone;
+            }
         }
 
         return probabilities;
     }
 
+    public double pow(double x, int e){
+        double res = 1;
+        for (int i = 0; i < e; i++) {
+            res*=x;
+        }
+        return res;
+    }
     public void updatePheromones() {
         for (int i = 0; i < nbVilles; i++) {
             for (int j = 0; j < nbVilles; j++) {
-                pheromones[i][j] *= EVAPORATION;
+                if (pheromones[i][j]>C)
+                    pheromones[i][j] *= EVAPORATION;
             }
         }
         double eval;
         for (Ant a : colony) {
             Path p = a.getPath();
 
-            eval = evaluation.quickEvaluate(a.getPath());
+            eval = evaluation.evaluate(a.getPath());
             if (eval < best) {
                 bestAnt = a;
                 best = eval;
                 System.out.println(best);
+            } else if (eval == Double.MAX_VALUE){
+                System.out.println("explode");
             }
 
             double contribution = Q / eval;
@@ -119,12 +137,15 @@ public class Colony extends CompetitorProject {
         }
     }
 
-    public void colonyParcour() {
-        for (int i = 0; i < colony.length; i++)
+    public void colonyParcour() throws Exception {
+        for (int i = 0; i < colony.length; i++) {
             for (int j = 0; j < nbVilles - 1; j++) {
                 double[] probs = calculateProbabilities(colony[i]);
                 colony[i].visitCity(chooseProb(probs));
             }
+            if (!evaluation.isValid(colony[i].getPath())) throw new Exception("Chemin invalide");
+        }
+
     }
 
     private int chooseProb(double[] probs) {

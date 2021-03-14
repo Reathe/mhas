@@ -5,7 +5,7 @@ import tsp.evaluation.Path;
 import tsp.evaluation.Problem;
 
 public class MutationEchangeRandom extends Mutation {
-    private static final double MUTATION_RATE = 0.5;
+    private static final double MUTATION_RATE = 0.3;
 
     public MutationEchangeRandom(Problem problem, Evaluation evaluation) {
         super(problem, evaluation);
@@ -14,7 +14,7 @@ public class MutationEchangeRandom extends Mutation {
 
     @Override
     public void mutate(Path p) {
-//        while (getRandom().nextDouble() < MUTATION_RATE)
+        while (getRandom().nextDouble() < MUTATION_RATE)
             echangeRandom(p);
     }
 

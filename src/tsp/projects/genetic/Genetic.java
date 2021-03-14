@@ -22,7 +22,7 @@ public class Genetic extends Project {
     private Path[] population;
     private final Mutation[] mutList = Mutation.getMutationList(problem, evaluation);
     private HashMap<Mutation, Double> mutScore = new HashMap<>();
-    double scoreDecrease = 0.6;
+    double scoreDecrease = 0.99;
     private Mutation mut = mutList[u.getRandom().nextInt(mutList.length)];
     private Crossover cross = new CrossoverPMX();
 
@@ -72,21 +72,11 @@ public class Genetic extends Project {
 
             if (temp < best) {
 
-                System.out.println(" NbRunSansAmelio = " + nbRunSansAmelio + "\tmut = " + mut.getClass().getSimpleName() + "\tnewBest = " + temp);
-//                System.out.println(mutScore);
+                System.out.println("NbRunSansAmelio = " + nbRunSansAmelio + "\tmut = " + mut.getClass().getSimpleName() + "\tnewBest = " + temp);
+                mutScore.forEach((mut,score)-> System.out.print(" " + mut.getClass().getSimpleName() + "=" + String.format("%.2f", score)));
                 nbRunSansAmelio = 0;
                 mutScore.put(mut, mutScore.get(mut)+Math.log(best-temp+1));
                 best = temp;
-            } else if (nbRunSansAmelio>1000 && nbRunSansAmelio%10 == 0){
-                mut = mutList[0];
-                for (int i = 0; i < 10; i++) {
-                    mutatePop();
-                }
-            }
-            if (sinceLastMutChange > 10) {
-                sinceLastMutChange = 0;
-                mut = SelectMutBasedOnScore();
-//                System.out.println(mut.getClass().getSimpleName());
             }
 
             //System.out.println(nbrun);
@@ -97,12 +87,11 @@ public class Genetic extends Project {
 
     private void oubliScoresMutation() {
         for (Mutation m : mutList) {
-            if (mutScore.get(m)>1)
-                mutScore.put(m, mutScore.get(m)*scoreDecrease);
+            mutScore.put(m, Math.max(1,mutScore.get(m)*scoreDecrease));
         }
     }
 
-    private Mutation SelectMutBasedOnScore() {
+    private Mutation selectMutBasedOnScore() {
         double sum = 0;
         for (Mutation m : mutList) {
             sum+=mutScore.get(m);
@@ -123,8 +112,11 @@ public class Genetic extends Project {
      * mutation de la population
      */
     public void mutatePop() {
-        for (int i = POPULATION_SIZE / 3; i < POPULATION_SIZE; i++) {
+        for (int i = POPULATION_SIZE / 2; i < POPULATION_SIZE; i++) {
 //            while (u.getRandom().nextDouble() < 0.1* Math.log(i))
+//            mut = mutList[u.getRandom().nextInt(mutList.length)];
+            mut = selectMutBasedOnScore();
+            assert mut != null;
             mut.mutate(population[i]);
         }
     }
@@ -142,7 +134,7 @@ public class Genetic extends Project {
      */
     public void nextGeneration() {
         Path[] childs;
-        for (int i = POPULATION_SIZE-1; i > POPULATION_SIZE/2; i -= 2) {
+        for (int i = POPULATION_SIZE-1; i > POPULATION_SIZE*3/4; i -= 2) {
 
             Path ind1 = population[u.rand.nextInt(POPULATION_SIZE / 2)], ind2 = population[u.rand.nextInt(POPULATION_SIZE / 2)];
 
