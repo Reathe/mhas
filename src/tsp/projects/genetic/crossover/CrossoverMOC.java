@@ -2,6 +2,11 @@ package tsp.projects.genetic.crossover;
 
 import tsp.evaluation.Path;
 
+/**
+ * @see Crossover
+ *
+ * Ce croisement ... voir le rapport
+ */
 public class CrossoverMOC extends Crossover {
 
     @Override

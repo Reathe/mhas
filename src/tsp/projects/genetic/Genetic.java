@@ -9,7 +9,7 @@ import tsp.projects.ants.Colony;
 import tsp.projects.genetic.crossover.Crossover;
 import tsp.projects.genetic.crossover.CrossoverPMX;
 import tsp.projects.genetic.mutation.Mutation;
-import tsp.projects.recuit.Recuit;
+import tsp.projects.recuit.HillClimbing;
 
 import java.util.Arrays;
 import java.util.Comparator;
@@ -26,7 +26,7 @@ public class Genetic extends Project {
     double scoreDecrease = 0.99;
     private Mutation mut = mutList[u.getRandom().nextInt(mutList.length)];
     private Crossover cross = new CrossoverPMX();
-    private Recuit recuit;
+    private HillClimbing recuit;
 
     int nbrun = 0, nbRunSansAmelio = 0, sinceLastMutChange = 0;
     double best = Double.MAX_VALUE;
@@ -40,7 +40,7 @@ public class Genetic extends Project {
     @Override
     public void initialization() {
         try {
-            recuit = new Recuit(evaluation);
+            recuit = new HillClimbing(evaluation);
         } catch (InvalidProjectException e) {
             e.printStackTrace();
         }

@@ -13,9 +13,12 @@ public class Ant {
     private final int[] path;
     private Path p;
     private final Random random = Utilities.getInstance().getRandom();
-
     private int currentIndex = 0;
 
+    /**
+     * Constructeur de fourmi
+     * @param length : Taille du problème / Nombre de villes
+     */
     Ant(int length) {
         nbVilles = length;
         visited = new boolean[nbVilles];
@@ -44,7 +47,6 @@ public class Ant {
         currentIndex++;
     }
 
-
     /**
      *
      * @param l : La ville
@@ -63,6 +65,10 @@ public class Ant {
         return this.p;
     }
 
+    /**
+     *
+     * @return Ville actuelle de la fourmi
+     */
     public int getCurrentCity() {
         return path[currentIndex-1];
     }

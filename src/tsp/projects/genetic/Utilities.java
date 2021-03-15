@@ -64,7 +64,9 @@ public class Utilities {
 
 
     /**
-     * Effectue un échange de i vers j sur le path p et replace j sur i
+     * Echange l'ordre des villes allant de i à j
+     * C'est-à-dire : 1 2 3 4 5 6 avec i= 3 et j = 6
+     * => 1 2 6 5 4 3
      *
      * @param i : Ville
      * @param j : Ville
@@ -84,14 +86,23 @@ public class Utilities {
     }
 
 
+    /**
+     * Décalagedes villes allant de i à j
+     * C'est-à-dire : 1 2 3 4 5 6 avec i= 3 et j = 6
+     * => 1 2 6 3 4 5
+     *
+     * @param i : Ville
+     * @param j : Ville
+     * @param p : Path qu'il faut modifier
+     */
     public void decalageDeIversJ(int i, int j, Path p) {
+        int villeADecal = p.getPath()[i];
+        int[] path = p.getPath();
         if (i > j) {
             int temp = i;
             i = j;
             j = temp;
         }
-        int villeADecal = p.getPath()[i];
-        int[] path = p.getPath();
         while (i < j) {
             path[i] = path[i + 1];
             i++;
@@ -100,11 +111,10 @@ public class Utilities {
     }
 
     /**
-     * Donne l'indice de val dans arr, si val n'est pas dans arr, retourne -1
      *
-     * @param val
-     * @param arr
-     * @return
+     * @param val : Valeur dont il faut trouver l'indice
+     * @param arr : Tableau dans lequel il faut trouver l'indice de val
+     * @return  l'indice de val dans arr, si val n'est pas dans arr : retourne -1
      */
     public int getIndice(int val, int[] arr) {
         for (int i = 0; i < arr.length; i++)
@@ -112,7 +122,16 @@ public class Utilities {
         return -1;
     }
 
+    /**
+     * Détermine un tableau d'entier pour un Path en utilisant l'heuristique du plus proche voisin
+     *
+     * @param problem : Problème pour lequel on veut notre path
+     * @return : Tableau d'entier (pour un Path)
+     */
     public int[] getCheminVillePlusProche(Problem problem) {
+        Coordinates coord, coordi;
+        double min, tempDistance;
+        int minVille;
         int length = problem.getLength();
         int[] chemin = new int[length];
         int[] villeVisite = new int[length];
@@ -120,13 +139,8 @@ public class Utilities {
         chemin[0] = rand.nextInt(length);
         villeVisite[chemin[0]] = 1;
 
-        Coordinates coordi;
-        double min;
-        int minVille;
-        double tempDistance;
-
         for (int i = 1; i < length; i++) {
-            Coordinates coord = problem.getCoordinates(chemin[i - 1]);
+            coord = problem.getCoordinates(chemin[i - 1]);
             min = Double.MAX_VALUE;
             minVille = -1;
             for (int j = 0; j < chemin.length; j++) {
@@ -146,6 +160,11 @@ public class Utilities {
     }
 
 
+    /**
+     * Choisit aléatoirement un index en fonction un tableau de probabilités
+     * @param probs : Tableau de probabilités
+     * @return : Un index, sinon -1
+     */
     public int chooseProb(double[] probs) {
         double sum = 0;
         for (double p : probs)
@@ -162,6 +181,16 @@ public class Utilities {
     }
 
 
+    /**
+     * Calcul la puissance d'un nombre
+     * Il est possible d'utiliser la librairie Math.pow
+     * @see Math
+     * Toutefois Math est plus lourd, puisqu'elle doit gérer des doubles
+     *
+     * @param x : Entier qu'il faut mettre sous une puissance
+     * @param e : Puissance
+     * @return Retourne x^e
+     */
     public double pow(double x, int e){
         double res = 1;
         for (int i = 0; i < e; i++) {
@@ -170,6 +199,11 @@ public class Utilities {
         return res;
     }
 
+    /**
+     *
+     * @param arr : Tableau de double
+     * @return : Indice de la valeur maximale du tableau
+     */
     public int getMax(double[] arr) {
         int maxI = 0;
         for (int p = 1; p < arr.length; p++) {

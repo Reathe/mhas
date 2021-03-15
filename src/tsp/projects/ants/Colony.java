@@ -14,8 +14,8 @@ public class Colony extends DemoProject {
     private final static double Q = 500;
 
     private final static int COLONY_SIZE = 3;
-    public final static double ALPHA = 1.00;
-    public final static double BETA = 25.00;
+    public final static int ALPHA = 1;
+    public final static int BETA = 25;
 
     private final Utilities util = Utilities.getInstance();
     private int nbVilles;
@@ -74,8 +74,8 @@ public class Colony extends DemoProject {
             if (!ant.visited(l)) {
 
                 distanceIL = problem.getCoordinates(i).distance(problem.getCoordinates(l));
-                alpha = util.pow(pheromones[i][l], (int) Colony.ALPHA);
-                beta = util.pow(1.0 / distanceIL, (int) Colony.BETA);
+                alpha = util.pow(pheromones[i][l], Colony.ALPHA);
+                beta = util.pow(1.0 / distanceIL, Colony.BETA);
 
                 double res = alpha * beta;
                 probabilities[l] = res;
