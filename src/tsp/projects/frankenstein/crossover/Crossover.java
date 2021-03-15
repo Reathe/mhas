@@ -4,6 +4,9 @@ import tsp.evaluation.Path;
 import tsp.projects.frankenstein.Utilities;
 
 /**
+ * @author Rafaël BACHOURIAN
+ * @author Enes USTA
+ *
  * Classe abstraite de cross over, permettant l'implémentation de plusieur croisement entre deux Path
  *
  */

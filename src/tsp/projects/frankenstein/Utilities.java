@@ -8,6 +8,9 @@ import java.util.Random;
 
 
 /**
+ * @author Rafaël BACHOURIAN
+ * @author Enes USTA
+ *
  * Classe utilitaire réunissant l'ensemble de fonction utilisée dans notre projet
  *
  * Utilise le Design Pattern Singleton

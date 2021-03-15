@@ -5,10 +5,14 @@ import tsp.evaluation.Path;
 import tsp.evaluation.Problem;
 
 /**
- * Classe de mutation
+ * @author Rafaël BACHOURIAN
+ * @author Enes USTA
+ *
+ *  Classe de mutation
  * @see Mutation
  *
  * Effectue un décalage d'une ville aléatoire i vers une autre ville aléatoire j
+ *
  */
 public class MutationDecalageRandom extends Mutation{
 

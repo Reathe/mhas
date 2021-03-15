@@ -3,6 +3,9 @@ package tsp.projects.frankenstein.crossover;
 import tsp.evaluation.Path;
 
 /**
+ * @author Rafaël BACHOURIAN
+ * @author Enes USTA
+ *
  * @see Crossover
  *
  * Voir le rapport

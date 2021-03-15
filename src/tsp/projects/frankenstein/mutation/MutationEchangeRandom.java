@@ -5,10 +5,14 @@ import tsp.evaluation.Path;
 import tsp.evaluation.Problem;
 
 /**
+ * @author Rafaël BACHOURIAN
+ * @author Enes USTA
+ *
  * Classe de mutation
  * @see Mutation
  *
  * Effectue un échange aléatoirement entre une paire de villes i et j
+
  */
 public class MutationEchangeRandom extends Mutation {
     private static final double MUTATION_RATE = 0.3;

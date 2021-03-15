@@ -6,6 +6,10 @@ import tsp.projects.frankenstein.Utilities;
 import java.util.Arrays;
 import java.util.Random;
 
+/**
+ * @author Rafaël BACHOURIAN
+ * @author Enes USTA
+ */
 public class Ant {
 
     private final int nbVilles;

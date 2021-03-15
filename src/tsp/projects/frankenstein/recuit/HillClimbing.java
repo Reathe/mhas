@@ -9,20 +9,23 @@ import tsp.projects.frankenstein.mutation.*;
 
 
 /**
+ * @author Rafaël BACHOURIAN
+ * @author Enes USTA
+ *
  * Heuristique Hill Climbiing
  *
  */
 public class HillClimbing extends DemoProject {
     public Path path;
-    public double fSi, fSpi, sommeFsi = 0;
+    public double fSi, fSpi;
     private final Utilities util = Utilities.getInstance();
     private Mutation[] mutList;
 
 
     public HillClimbing(Evaluation evaluation) throws InvalidProjectException {
         super(evaluation);
-        this.addAuthor("Nous");
-        this.setMethodName("Recuit");
+        this.addAuthor("BACHOURIAN USTA");
+        this.setMethodName("Hill Climbing");
     }
 
     @Override

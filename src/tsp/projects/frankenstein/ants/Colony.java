@@ -7,6 +7,10 @@ import tsp.projects.frankenstein.Utilities;
 
 import java.util.Arrays;
 
+/**
+ * @author Rafaël BACHOURIAN
+ * @author Enes USTA
+ */
 public class Colony extends DemoProject {
 
     private final static double C = 1;

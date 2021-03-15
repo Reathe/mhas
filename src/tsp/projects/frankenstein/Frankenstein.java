@@ -16,7 +16,8 @@ import java.util.Comparator;
 import java.util.HashMap;
 
 /**
- * @author USTA Enes et BACHOURIAN Rafael
+ * @author USTA Enes
+ * @author BACHOURIAN Rafael
  * Fait des trucs
  */
 public class Frankenstein extends CompetitorProject {
@@ -29,7 +30,7 @@ public class Frankenstein extends CompetitorProject {
     private final HashMap<Mutation, Double> mutScore = new HashMap<>();
     double scoreDecrease = 0.99;
     private Mutation mut;
-    private Crossover cross = new CrossoverMOC();
+    private final Crossover cross = new CrossoverMOC();
     private HillClimbing hillClimbing;
 
     int nbrun = 0, nbRunSansAmelio = 0, sinceLastMutChange = 0;

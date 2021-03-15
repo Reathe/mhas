@@ -5,6 +5,10 @@ import tsp.evaluation.Path;
 import tsp.evaluation.Problem;
 import tsp.projects.frankenstein.Utilities;
 
+/**
+ * @author Rafaël BACHOURIAN
+ * @author Enes USTA
+ */
 public abstract class Mutation extends Utilities {
     public Problem problem;
     public Evaluation evaluation;

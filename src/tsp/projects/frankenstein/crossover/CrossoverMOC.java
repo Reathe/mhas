@@ -3,10 +3,15 @@ package tsp.projects.frankenstein.crossover;
 import tsp.evaluation.Path;
 
 /**
+ * @author Rafaël BACHOURIAN
+ * @author Enes USTA
+ *
  * @see Crossover
  *
  * Ce croisement ... voir le rapport
+ *
  */
+
 public class CrossoverMOC extends Crossover {
 
     @Override

@@ -6,6 +6,9 @@ import tsp.evaluation.Path;
 import tsp.evaluation.Problem;
 
 /**
+ * @author Rafaël BACHOURIAN
+ * @author Enes USTA
+ *
  * Classe de mutation
  *
  * @see Mutation
