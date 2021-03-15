@@ -1,11 +1,11 @@
-package tsp.projects.recuit;
+package tsp.projects.frankenstein.recuit;
 
 import tsp.evaluation.Evaluation;
 import tsp.evaluation.Path;
 import tsp.projects.DemoProject;
 import tsp.projects.InvalidProjectException;
-import tsp.projects.genetic.Utilities;
-import tsp.projects.genetic.mutation.Mutation;
+import tsp.projects.frankenstein.Utilities;
+import tsp.projects.frankenstein.mutation.*;
 
 
 /**
@@ -14,9 +14,9 @@ import tsp.projects.genetic.mutation.Mutation;
  */
 public class HillClimbing extends DemoProject {
     public Path path;
-    double fSi, fSpi, sommeFsi = 0;
+    public double fSi, fSpi, sommeFsi = 0;
     private final Utilities util = Utilities.getInstance();
-    private final Mutation[] mutList = Mutation.getMutationList(problem, evaluation);
+    private Mutation[] mutList;
 
 
     public HillClimbing(Evaluation evaluation) throws InvalidProjectException {
@@ -30,12 +30,19 @@ public class HillClimbing extends DemoProject {
         int[] chemin = util.getCheminVillePlusProche(this.problem);
         this.path = new Path(chemin);
         fSi = this.evaluation.evaluate(this.path);
+        if (problem.getLength() < 300)
+            mutList = new Mutation[]{
+                    new MutationEchangeRandom(problem, evaluation),
+                    new MutationDecalageRandom(problem, evaluation),
+                    new MutationInverseOrdreZoneRandom(problem, evaluation),
+                    new MutationEchangeVoisin(problem, evaluation)
 
-        for (int i = 0; i < 100; i++) {
-            fSpi = evaluation.evaluate(path);
-            sommeFsi += fSpi - fSi;
-            fSi = fSpi;
-        }
+            };
+        else
+            mutList = new Mutation[]{
+                    new MutationDecalageRandom(problem, evaluation),
+                    new MutationInverseOrdreZoneRandom(problem, evaluation)
+            };
     }
 
     @Override

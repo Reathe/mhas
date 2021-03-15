@@ -1,9 +1,9 @@
-package tsp.projects.ants;
+package tsp.projects.frankenstein.ants;
 
 import tsp.evaluation.Evaluation;
 import tsp.projects.DemoProject;
 import tsp.projects.InvalidProjectException;
-import tsp.projects.genetic.Utilities;
+import tsp.projects.frankenstein.Utilities;
 
 import java.util.Arrays;
 
@@ -13,9 +13,9 @@ public class Colony extends DemoProject {
     private final static double EVAPORATION = 0.99;
     private final static double Q = 500;
 
-    private final static int COLONY_SIZE = 3;
+    private final static int COLONY_SIZE = 2;
     public final static int ALPHA = 1;
-    public final static int BETA = 25;
+    public final static int BETA = 24;
 
     private final Utilities util = Utilities.getInstance();
     private int nbVilles;

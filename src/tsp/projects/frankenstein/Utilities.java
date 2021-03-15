@@ -1,4 +1,4 @@
-package tsp.projects.genetic;
+package tsp.projects.frankenstein;
 
 import tsp.evaluation.Coordinates;
 import tsp.evaluation.Path;
@@ -96,13 +96,13 @@ public class Utilities {
      * @param p : Path qu'il faut modifier
      */
     public void decalageDeIversJ(int i, int j, Path p) {
-        int villeADecal = p.getPath()[i];
-        int[] path = p.getPath();
         if (i > j) {
             int temp = i;
             i = j;
             j = temp;
         }
+        int villeADecal = p.getPath()[i];
+        int[] path = p.getPath();
         while (i < j) {
             path[i] = path[i + 1];
             i++;

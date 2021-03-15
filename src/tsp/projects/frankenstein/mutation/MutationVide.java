@@ -1,4 +1,4 @@
-package tsp.projects.genetic.mutation;
+package tsp.projects.frankenstein.mutation;
 
 import tsp.evaluation.Evaluation;
 import tsp.evaluation.Path;

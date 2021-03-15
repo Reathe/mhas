@@ -1,7 +1,7 @@
-package tsp.projects.ants;
+package tsp.projects.frankenstein.ants;
 
 import tsp.evaluation.Path;
-import tsp.projects.genetic.Utilities;
+import tsp.projects.frankenstein.Utilities;
 
 import java.util.Arrays;
 import java.util.Random;

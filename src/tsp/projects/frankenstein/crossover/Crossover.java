@@ -1,7 +1,7 @@
-package tsp.projects.genetic.crossover;
+package tsp.projects.frankenstein.crossover;
 
 import tsp.evaluation.Path;
-import tsp.projects.genetic.Utilities;
+import tsp.projects.frankenstein.Utilities;
 
 /**
  * Classe abstraite de cross over, permettant l'implémentation de plusieur croisement entre deux Path

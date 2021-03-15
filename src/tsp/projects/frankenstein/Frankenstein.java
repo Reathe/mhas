@@ -1,99 +1,118 @@
-package tsp.projects.genetic;
+package tsp.projects.frankenstein;
 
 
 import tsp.evaluation.Evaluation;
 import tsp.evaluation.Path;
+import tsp.projects.CompetitorProject;
 import tsp.projects.InvalidProjectException;
-import tsp.projects.Project;
-import tsp.projects.ants.Colony;
-import tsp.projects.genetic.crossover.Crossover;
-import tsp.projects.genetic.crossover.CrossoverPMX;
-import tsp.projects.genetic.mutation.Mutation;
-import tsp.projects.recuit.HillClimbing;
+import tsp.projects.frankenstein.ants.Colony;
+import tsp.projects.frankenstein.crossover.Crossover;
+import tsp.projects.frankenstein.crossover.CrossoverMOC;
+import tsp.projects.frankenstein.mutation.*;
+import tsp.projects.frankenstein.recuit.HillClimbing;
 
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
 
-public class Genetic extends Project {
+/**
+ * @author USTA Enes et BACHOURIAN Rafael
+ * Fait des trucs
+ */
+public class Frankenstein extends CompetitorProject {
 
     Utilities u = Utilities.getInstance();
     private int length;
     private static final int POPULATION_SIZE = 200;
     private Path[] population;
-    private final Mutation[] mutList = Mutation.getMutationList(problem, evaluation);
-    private HashMap<Mutation, Double> mutScore = new HashMap<>();
+    private Mutation[] mutList;
+    private final HashMap<Mutation, Double> mutScore = new HashMap<>();
     double scoreDecrease = 0.99;
-    private Mutation mut = mutList[u.getRandom().nextInt(mutList.length)];
-    private Crossover cross = new CrossoverPMX();
-    private HillClimbing recuit;
+    private Mutation mut;
+    private Crossover cross = new CrossoverMOC();
+    private HillClimbing hillClimbing;
 
     int nbrun = 0, nbRunSansAmelio = 0, sinceLastMutChange = 0;
     double best = Double.MAX_VALUE;
 
-    public Genetic(Evaluation evaluation) throws InvalidProjectException {
+    public Frankenstein(Evaluation evaluation) throws InvalidProjectException {
         super(evaluation);
-        this.addAuthor("Nous");
-        this.setMethodName("Genetic");
+        this.addAuthor("BACHOURIAN Rafael");
+        this.addAuthor("USTA Enes");
+        this.setMethodName("Frankenstein");
     }
 
     @Override
     public void initialization() {
-        try {
-            recuit = new HillClimbing(evaluation);
-        } catch (InvalidProjectException e) {
-            e.printStackTrace();
-        }
+        initMutation();
+        initHillClimbing();
+
         nbRunSansAmelio = 0;
         nbrun = 0;
         sinceLastMutChange = 0;
         this.length = problem.getLength();
         this.population = new Path[POPULATION_SIZE];
-        for (Mutation m : mutList) {
-            mutScore.put(m, 1.0);
-        }
 
         this.generateRandomPop(length);
+        initPop();
+        sortPopulation();
+        evaluation.evaluate(population[0]);
+    }
+
+    private void initPop() {
         try {
             Colony colony = new Colony(evaluation);
             colony.initialization();
 
-            for (int i = 0; i < 1e4 / length; i++) {
+            for (int i = 0; i < 50; i++) {
                 colony.loop();
                 this.population[i] = new Path(colony.getBestAnt().getPath());
             }
         } catch (InvalidProjectException e) {
             e.printStackTrace();
         }
+
         for (int i = 50; i < POPULATION_SIZE / 2; i++) {
             int[] tmp = u.getCheminVillePlusProche(problem);
             this.population[i] = new Path(tmp);
         }
+    }
 
-        sortPopulation();
-        recuit.initialization();
-        evaluation.evaluate(population[0]);
-        System.err.println("Fin init");
+    private void initHillClimbing() {
+        try {
+            hillClimbing = new HillClimbing(evaluation);
+            hillClimbing.initialization();
+        } catch (InvalidProjectException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void initMutation() {
+        mutList = new Mutation[]{
+                new MutationEchangeRandom(problem, evaluation),
+                new MutationDecalageRandom(problem, evaluation),
+                new MutationInverseOrdreZoneRandom(problem, evaluation),
+                new MutationEchangeVoisin(problem, evaluation)
+        };
+        mut = mutList[u.getRandom().nextInt(mutList.length)];
+        for (Mutation m : mutList) {
+            mutScore.put(m, 1.0);
+        }
     }
 
     @Override
     public void loop() {
         if (nbRunSansAmelio % 1000 == 100) {
-//            System.err.println("\nRecuit start");
-            recuit.path = population[0];
-
-//            if (nbRunSansAmelio > 10)
-//                recuit.initialization2(population[0]);
+            hillClimbing.path = population[0];
+            hillClimbing.fSi = best;
             for (int i = 0; i < 20000; i++) {
-                recuit.hillClimbingLoop();
+                hillClimbing.loop();
             }
-            double temp = evaluation.evaluate(recuit.path);
+            double temp = evaluation.evaluate(hillClimbing.path);
             if (temp < best) {
-
-                System.out.println("Recuit améliore " + temp);
                 nbRunSansAmelio = 0;
                 best = temp;
-                population[population.length / 10] = recuit.path;
+                population[population.length / 10] = hillClimbing.path;
             }
         } else
             try {
@@ -110,27 +129,30 @@ public class Genetic extends Project {
                 oubliScoresMutation();
 
                 if (temp < best) {
-
-                    System.out.println("NbRunSansAmelio = " + nbRunSansAmelio + "\tmut = " + mut.getClass().getSimpleName() + "\tnewBest = " + temp);
-                    mutScore.forEach((mut, score) -> System.out.print(" " + mut.getClass().getSimpleName() + "=" + String.format("%.2f", score)));
-                    System.out.println();
                     nbRunSansAmelio = 0;
                     mutScore.put(mut, mutScore.get(mut) + Math.log(best - temp + 1));
                     best = temp;
                 }
-
-                //System.out.println(nbrun);
             } catch (Exception e) {
                 e.printStackTrace();
             }
     }
 
+    /**
+     * Réduit le score de toutes les mutations
+     */
     private void oubliScoresMutation() {
         for (Mutation m : mutList) {
             mutScore.put(m, Math.max(1, mutScore.get(m) * scoreDecrease));
         }
     }
 
+    /**
+     * Selectionne aléatoirement une mutations
+     * La proba de selection est proportionnelle au score relatif aux autres mutation
+     *
+     * @return the mutation
+     */
     private Mutation selectMutBasedOnScore() {
         double sum = 0;
         for (Mutation m : mutList) {
@@ -144,7 +166,7 @@ public class Genetic extends Project {
                 return m;
             }
         }
-        return null;
+        return mutList[0];
     }
 
     /**
@@ -152,10 +174,7 @@ public class Genetic extends Project {
      */
     public void mutatePop() {
         for (int i = POPULATION_SIZE / 2; i < POPULATION_SIZE; i++) {
-//            while (u.getRandom().nextDouble() < 0.1* Math.log(i))
-//            mut = mutList[u.getRandom().nextInt(mutList.length)];
             mut = selectMutBasedOnScore();
-            assert mut != null;
             mut.mutate(population[i]);
         }
     }
