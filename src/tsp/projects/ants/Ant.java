@@ -1,35 +1,43 @@
 package tsp.projects.ants;
 
 import tsp.evaluation.Path;
+import tsp.projects.genetic.Utilities;
 
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.Random;
 
 public class Ant {
 
-    private int nbVilles;
-    private boolean[] visited;
-    private int[] path;
+    private final int nbVilles;
+    private final boolean[] visited;
+    private final int[] path;
     private Path p;
-    private Random r = new Random(System.currentTimeMillis());
-
+    private final Random random = Utilities.getInstance().getRandom();
 
     private int currentIndex = 0;
 
     Ant(int length) {
         nbVilles = length;
-        visited= new boolean[nbVilles];
+        visited = new boolean[nbVilles];
         path = new int[nbVilles];
         this.reset();
     }
 
+    /**
+     * Réinitialisation de la fourmi
+     * Remet son nombre de ville visitées à 0
+     * La remet dans une ville aléatoire
+     */
     public void reset(){
         currentIndex = 0;
         Arrays.fill(visited, false);
-        this.visitCity(r.nextInt(nbVilles));
+        this.visitCity(random.nextInt(nbVilles));
     }
 
+    /**
+     * Visite d'une ville
+     * @param city : Ville à visiter
+     */
     public void visitCity(int city){
         path[currentIndex] = city;
         visited[city] = true;
@@ -37,11 +45,19 @@ public class Ant {
     }
 
 
-
+    /**
+     *
+     * @param l : La ville
+     * @return : Si la ville a été visitée
+     */
     boolean visited(int l) {
         return visited[l];
     }
 
+    /**
+     *
+     * @return Le path de la fourmi
+     */
     public Path getPath(){
         this.p = new Path(path);
         return this.p;
@@ -58,7 +74,7 @@ public class Ant {
                 ", visited=" + Arrays.toString(visited) +
                 ", path=" + Arrays.toString(path) +
                 ", p=" + p +
-                ", r=" + r +
+                ", r=" + random +
                 ", currentIndex=" + currentIndex +
                 '}';
     }

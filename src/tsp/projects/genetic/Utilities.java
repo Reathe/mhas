@@ -112,6 +112,30 @@ public class Utilities {
     }
 
 
+    public int chooseProb(double[] probs) {
+        double sum = 0;
+        for (double p : probs)
+            sum+=p;
+
+        double num = rand.nextDouble()*sum;
+        sum = 0;
+        for (int i = 0; i < probs.length ; i++) {
+            sum += probs[i];
+            if (num <= sum)
+                return i;
+        }
+        return -1;
+    }
+
+
+    public double pow(double x, int e){
+        double res = 1;
+        for (int i = 0; i < e; i++) {
+            res*=x;
+        }
+        return res;
+    }
+
     public int getMax(double[] arr) {
         int maxI = 0;
         for (int p = 1; p < arr.length; p++) {
