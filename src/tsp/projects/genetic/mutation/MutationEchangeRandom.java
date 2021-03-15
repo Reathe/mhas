@@ -4,13 +4,18 @@ import tsp.evaluation.Evaluation;
 import tsp.evaluation.Path;
 import tsp.evaluation.Problem;
 
+/**
+ * Classe de mutation
+ * @see Mutation
+ *
+ * Effectue un échange aléatoirement entre une paire de villes i et j
+ */
 public class MutationEchangeRandom extends Mutation {
     private static final double MUTATION_RATE = 0.3;
 
     public MutationEchangeRandom(Problem problem, Evaluation evaluation) {
         super(problem, evaluation);
     }
-
 
     @Override
     public void mutate(Path p) {

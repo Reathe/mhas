@@ -6,24 +6,70 @@ import tsp.evaluation.Problem;
 
 import java.util.Random;
 
+
+/**
+ * Classe utilitaire réunissant l'ensemble de fonction utilisée dans notre projet
+ *
+ * Utilise le Design Pattern Singleton
+ */
 public class Utilities {
     public Random rand = new Random(System.currentTimeMillis());
+    protected Utilities() {}
 
     private static Utilities instance = null;
 
-    protected Utilities() {
-    }
-
+    /**
+     * Design Pattern : Singleton
+     * @return l'unique instance Utilities, pas besoin de plus
+     */
     public static Utilities getInstance(){
         if(instance == null)
             instance = new Utilities();
         return instance;
     }
 
+    /**
+     *
+     * @return Un objet Random pour de l'aléatoire
+     */
     public Random getRandom() {
         return rand;
     }
 
+    /**
+     * Echange deux ville i et j sur un path p
+     *
+     * @param i : Ville
+     * @param j : Ville
+     * @param p : Path sur lequel il faut faire l'échange
+     */
+    public void echange(int i, int j, Path p) {
+        int temp = p.getPath()[i];
+        p.getPath()[i] = p.getPath()[j];
+        p.getPath()[j] = temp;
+    }
+
+    /**
+     * Echange deux ville i et j sur un tableau d'entiers tab
+     *
+     * @param i : Ville
+     * @param j : Ville
+     * @param tab : Tableau d'entier sur lequel il faut faire l'échange
+     */
+    public void echange(int i, int j, int[] tab) {
+        int temp = tab[i];
+        tab[i] = tab[j];
+        tab[j] = temp;
+    }
+
+
+    /**
+     * Effectue un échange de i vers j sur le path p et replace j sur i
+     *
+     * @param i : Ville
+     * @param j : Ville
+     * @param p : Path qu'il faut modifier
+     */
     public void echangeOrdreEntreIEtJ(int i, int j, Path p) {
         if (i > j) {
             int temp = i;
@@ -35,18 +81,6 @@ public class Utilities {
             i++;
             j--;
         }
-    }
-
-    public void echange(int i, int j, Path p) {
-        int temp = p.getPath()[i];
-        p.getPath()[i] = p.getPath()[j];
-        p.getPath()[j] = temp;
-    }
-
-    public void echange(int i, int j, int[] tab) {
-        int temp = tab[i];
-        tab[i] = tab[j];
-        tab[j] = temp;
     }
 
 

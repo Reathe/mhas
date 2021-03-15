@@ -130,4 +130,8 @@ public class Colony extends DemoProject {
             pheromones[p[nbVilles - 1]][p[0]] += contribution;
         }
     }
+
+    public Ant getBestAnt() {
+        return bestAnt;
+    }
 }

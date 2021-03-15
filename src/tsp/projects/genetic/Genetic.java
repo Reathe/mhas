@@ -60,7 +60,7 @@ public class Genetic extends Project {
 
             for (int i = 0; i < 1e4 / length; i++) {
                 colony.loop();
-                this.population[i] = new Path(colony.bestAnt.getPath());
+                this.population[i] = new Path(colony.getBestAnt().getPath());
             }
         } catch (InvalidProjectException e) {
             e.printStackTrace();

@@ -4,9 +4,13 @@ import tsp.evaluation.Evaluation;
 import tsp.evaluation.Path;
 import tsp.evaluation.Problem;
 
+/**
+ * Classe de mutation
+ * @see Mutation
+ *
+ * Effectue un échange en choisissant aléatoirement une ville et celle qui la suit
+ */
 public class MutationEchangeVoisin extends Mutation{
-
-
     public MutationEchangeVoisin(Problem problem, Evaluation evaluation) {
         super(problem, evaluation);
     }

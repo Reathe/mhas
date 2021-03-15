@@ -3,6 +3,7 @@ package tsp.projects.genetic.crossover;
 import tsp.evaluation.Path;
 
 public class CrossoverMOC extends Crossover {
+
     @Override
     public Path[] crossover(Path p1, Path p2) {
         int length = p1.getPath().length;
@@ -31,6 +32,4 @@ public class CrossoverMOC extends Crossover {
 
         return new Path[]{new Path(child1), new Path(child2)};
     }
-
-
 }

@@ -4,7 +4,8 @@ import tsp.evaluation.Path;
 
 public class CrossoverPMX extends Crossover {
 
-    public Path[] crossoverPMX(Path p1, Path p2) {
+    @Override
+    public Path[] crossover(Path p1, Path p2) {
         int length = p1.getPath().length;
         int pivot = getRandom().nextInt(length);
         int[] child1 = p1.getPath().clone();
@@ -18,8 +19,4 @@ public class CrossoverPMX extends Crossover {
         return new Path[]{new Path(child1), new Path(child2)};
     }
 
-    @Override
-    public Path[] crossover(Path p1, Path p2) {
-        return crossoverPMX(p1,p2);
-    }
 }
