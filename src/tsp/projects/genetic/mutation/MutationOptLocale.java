@@ -19,7 +19,7 @@ public class MutationOptLocale extends Mutation{
 
     public Path opt2(Path path) {
         int length = path.getPath().length;
-        for (int i = 0; i < length - 2; i++) {
+        for (int i = rand.nextInt(length-2); i < length - 2; i++) {
             for (int j = i+2; j < length - 1; j++) {
                 double eval = evaluation.quickEvaluate(path),
                         evalapres;
@@ -28,10 +28,11 @@ public class MutationOptLocale extends Mutation{
                         p = problem.getCoordinates(j),
                         sp = problem.getCoordinates(j + 1);
                 if (v.distance(sv) + p.distance(sp) > v.distance(p) + sv.distance(sp)) {
-                    echangeOrdreEntreIEtJ(i, j, path);
+                    echangeOrdreEntreIEtJ(i+1, j, path);
                     evalapres = evaluation.quickEvaluate(path);
                     if (evalapres >= eval) {
-                        echangeOrdreEntreIEtJ(i, j, path);
+                        echangeOrdreEntreIEtJ(i+1, j, path);
+                        return path;
                     }
                     else {
                         return path;

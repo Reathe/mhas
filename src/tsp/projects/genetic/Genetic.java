@@ -5,10 +5,11 @@ import tsp.evaluation.Evaluation;
 import tsp.evaluation.Path;
 import tsp.projects.InvalidProjectException;
 import tsp.projects.Project;
-//import tsp.projects.ants.zColony;
+import tsp.projects.ants.Colony;
 import tsp.projects.genetic.crossover.Crossover;
 import tsp.projects.genetic.crossover.CrossoverPMX;
 import tsp.projects.genetic.mutation.Mutation;
+import tsp.projects.recuit.Recuit;
 
 import java.util.Arrays;
 import java.util.Comparator;
@@ -25,7 +26,7 @@ public class Genetic extends Project {
     double scoreDecrease = 0.99;
     private Mutation mut = mutList[u.getRandom().nextInt(mutList.length)];
     private Crossover cross = new CrossoverPMX();
-
+    private Recuit recuit;
 
     int nbrun = 0, nbRunSansAmelio = 0, sinceLastMutChange = 0;
     double best = Double.MAX_VALUE;
@@ -38,70 +39,108 @@ public class Genetic extends Project {
 
     @Override
     public void initialization() {
+        try {
+            recuit = new Recuit(evaluation);
+        } catch (InvalidProjectException e) {
+            e.printStackTrace();
+        }
+        nbRunSansAmelio = 0;
+        nbrun = 0;
+        sinceLastMutChange = 0;
         this.length = problem.getLength();
         this.population = new Path[POPULATION_SIZE];
         for (Mutation m : mutList) {
-            mutScore.put(m,1.0);
+            mutScore.put(m, 1.0);
         }
 
         this.generateRandomPop(length);
-        for (int i = 0; i < POPULATION_SIZE / 2; i++) {
+        try {
+            Colony colony = new Colony(evaluation);
+            colony.initialization();
+
+            for (int i = 0; i < 1e4 / length; i++) {
+                colony.loop();
+                this.population[i] = new Path(colony.bestAnt.getPath());
+            }
+        } catch (InvalidProjectException e) {
+            e.printStackTrace();
+        }
+        for (int i = 50; i < POPULATION_SIZE / 2; i++) {
             int[] tmp = u.getCheminVillePlusProche(problem);
             this.population[i] = new Path(tmp);
         }
 
         sortPopulation();
+        recuit.initialization();
         evaluation.evaluate(population[0]);
-        System.out.print(" Fin init");
+        System.err.println("Fin init");
     }
 
     @Override
     public void loop() {
-        try {
-            nbrun++;
-            sinceLastMutChange++;
+        if (nbRunSansAmelio % 1000 == 100) {
+//            System.err.println("\nRecuit start");
+            recuit.path = population[0];
 
-            nextGeneration();
-            mutatePop();
-            sortPopulation();
-
-
-            nbRunSansAmelio++;
-            double temp = evaluation.evaluate(population[0]);
-            oubliScoresMutation();
-
+//            if (nbRunSansAmelio > 10)
+//                recuit.initialization2(population[0]);
+            for (int i = 0; i < 20000; i++) {
+                recuit.hillClimbingLoop();
+            }
+            double temp = evaluation.evaluate(recuit.path);
             if (temp < best) {
 
-                System.out.println("NbRunSansAmelio = " + nbRunSansAmelio + "\tmut = " + mut.getClass().getSimpleName() + "\tnewBest = " + temp);
-                mutScore.forEach((mut,score)-> System.out.print(" " + mut.getClass().getSimpleName() + "=" + String.format("%.2f", score)));
+                System.out.println("Recuit améliore " + temp);
                 nbRunSansAmelio = 0;
-                mutScore.put(mut, mutScore.get(mut)+Math.log(best-temp+1));
                 best = temp;
+                population[population.length / 10] = recuit.path;
             }
+        } else
+            try {
+                nbrun++;
+                sinceLastMutChange++;
 
-            //System.out.println(nbrun);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+                nextGeneration();
+                mutatePop();
+                sortPopulation();
+
+
+                nbRunSansAmelio++;
+                double temp = evaluation.evaluate(population[0]);
+                oubliScoresMutation();
+
+                if (temp < best) {
+
+                    System.out.println("NbRunSansAmelio = " + nbRunSansAmelio + "\tmut = " + mut.getClass().getSimpleName() + "\tnewBest = " + temp);
+                    mutScore.forEach((mut, score) -> System.out.print(" " + mut.getClass().getSimpleName() + "=" + String.format("%.2f", score)));
+                    System.out.println();
+                    nbRunSansAmelio = 0;
+                    mutScore.put(mut, mutScore.get(mut) + Math.log(best - temp + 1));
+                    best = temp;
+                }
+
+                //System.out.println(nbrun);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
     }
 
     private void oubliScoresMutation() {
         for (Mutation m : mutList) {
-            mutScore.put(m, Math.max(1,mutScore.get(m)*scoreDecrease));
+            mutScore.put(m, Math.max(1, mutScore.get(m) * scoreDecrease));
         }
     }
 
     private Mutation selectMutBasedOnScore() {
         double sum = 0;
         for (Mutation m : mutList) {
-            sum+=mutScore.get(m);
+            sum += mutScore.get(m);
         }
-        double num = u.getRandom().nextDouble()*sum;
+        double num = u.getRandom().nextDouble() * sum;
         sum = 0;
         for (Mutation m : mutList) {
             sum += mutScore.get(m);
-            if (num <= sum)
-            {
+            if (num <= sum) {
                 return m;
             }
         }
@@ -134,7 +173,7 @@ public class Genetic extends Project {
      */
     public void nextGeneration() {
         Path[] childs;
-        for (int i = POPULATION_SIZE-1; i > POPULATION_SIZE*3/4; i -= 2) {
+        for (int i = POPULATION_SIZE - 1; i > POPULATION_SIZE * 3 / 4; i -= 2) {
 
             Path ind1 = population[u.rand.nextInt(POPULATION_SIZE / 2)], ind2 = population[u.rand.nextInt(POPULATION_SIZE / 2)];
 

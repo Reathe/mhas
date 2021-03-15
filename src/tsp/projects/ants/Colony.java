@@ -4,12 +4,13 @@ import tsp.evaluation.Coordinates;
 import tsp.evaluation.Evaluation;
 import tsp.evaluation.Path;
 import tsp.projects.CompetitorProject;
+import tsp.projects.DemoProject;
 import tsp.projects.InvalidProjectException;
 
 import java.util.Arrays;
 import java.util.Random;
 
-public class Colony extends CompetitorProject {
+public class Colony extends DemoProject {
 
     private final static double C = 1;
     private final static double EVAPORATION = 0.99;
@@ -17,9 +18,9 @@ public class Colony extends CompetitorProject {
 //    private final static double antFactor = 0.01;
     private double randomFactor = 0.01;
 
-    private int COLONY_SIZE =4;
+    private int COLONY_SIZE = 3;
     public final static double ALPHA = 1.00;
-    public final static double BETA = 24.00;
+    public final static double BETA = 25.00;
 
     private Random r = new Random(System.currentTimeMillis());
     private int nbVilles;
@@ -27,7 +28,7 @@ public class Colony extends CompetitorProject {
     public double[][] pheromones;
     int nbloop=0;
     private double best = Double.MAX_VALUE;
-    private Ant bestAnt;
+    public Ant bestAnt;
 
 
     public Colony(Evaluation evaluation) throws InvalidProjectException {

@@ -20,10 +20,10 @@ public abstract class Mutation extends Utilities {
         return new Mutation[]{
 //                new MutationVide(problem, evaluation),
 //                new MutationOptLocale(problem,evaluation),
-                new MutationEchangeRandom(problem, evaluation),
+//                new MutationEchangeRandom(problem, evaluation),
                 new MutationDecalageRandom(problem, evaluation),
                 new MutationInverseOrdreZoneRandom(problem, evaluation),
-                new MutationEchangeVoisin(problem, evaluation)
+//                new MutationEchangeVoisin(problem, evaluation)
 
         };
     }

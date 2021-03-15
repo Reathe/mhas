@@ -13,7 +13,7 @@ import java.util.Random;
 public class Recuit extends DemoProject {
     private int length;
     private int transfoA = 0, transfoT = 0;
-    private Path path;
+    public Path path;
     private double T;
     private final double lambda = 0.99;
     double fSi, fSpi, sommeFsi = 0;
@@ -44,36 +44,49 @@ public class Recuit extends DemoProject {
         fSi = this.evaluation.evaluate(this.path);
 
         for (int i = 0; i < 100; i++) {
-            echangeRandom(path);
+//            echangeRandom(path);
             fSpi = evaluation.evaluate(path);
             sommeFsi += fSpi - fSi;
             fSi = fSpi;
         }
 
-        this.T = -Math.abs(sommeFsi / 100) / Math.log(p0);
+//        this.T = -Math.abs(sommeFsi / 100) / Math.log(p0);
 
     }
 
     @Override
     public void loop() {
-
-        transfoT++;
-        Path temp = new Path(path);
-
-        mutList[r.nextInt(mutList.length)].mutate(temp);
-
-        fSpi = evaluation.evaluate(temp);
-        double p = Math.min(1, Math.exp(-(fSpi - fSi) / T));
-
-        if (fSpi < fSi || r.nextDouble() < p) {
-            fSi = fSpi;
-            transfoA++;
-            path = temp;
-        }
-        if (transfoA % 12 == 0 || transfoT % 100 == 0)
-            T *= lambda;
+        hillClimbingLoop();
+//        transfoT++;
+//        Path temp = new Path(path);
+//
+//        mutList[r.nextInt(mutList.length)].mutate(temp);
+//
+//        fSpi = evaluation.evaluate(temp);
+//        double p = Math.min(1, Math.exp(-(fSpi - fSi) / T));
+//
+//        if (fSpi < fSi || r.nextDouble() < p) {
+//            fSi = fSpi;
+//            transfoA++;
+//            path = temp;
+//        }
+//        if (transfoA % 12 == 0 || transfoT % 100 == 0)
+//            T *= lambda;
 
     }
+
+    public void hillClimbingLoop() {
+        Path temp = new Path(path);
+        mutList[r.nextInt(mutList.length)].mutate(temp);
+        fSpi = evaluation.quickEvaluate(temp);
+
+        if (fSpi < fSi) {
+            fSi = fSpi;
+            path = temp;
+            evaluation.evaluate(path);
+        }
+    }
+
 
     private void echangeRandom(Path path) {
         u.echange(r.nextInt(length), r.nextInt(length), path);
